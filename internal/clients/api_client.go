@@ -454,6 +454,9 @@ func buildKibanaConfig(d *schema.ResourceData, baseConfig BaseConfig) (kibana.Co
 		if endpoint := os.Getenv("KIBANA_ENDPOINT"); endpoint != "" {
 			config.Address = endpoint
 		}
+		if insecure := os.Getenv("KIBANA_INSECURE"); insecure != "" {
+			config.DisableVerifySSL = true
+		}
 
 		if username, ok := kibConfig["username"]; ok && username != "" {
 			config.Username = username.(string)
