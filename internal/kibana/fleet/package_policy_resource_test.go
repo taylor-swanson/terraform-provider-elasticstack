@@ -26,7 +26,7 @@ func TestAccResourcePackagePolicy(t *testing.T) {
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "namespace", "default"),
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "description", "Test Package Policy"),
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "package.0.name", "winlog"),
-					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "package.0.version", "1.12.4"),
+					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "package.0.version", "1.10.0"),
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "input.0.policy_template", "winlogs"),
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "input.0.enabled", "true"),
 				),
@@ -38,7 +38,7 @@ func TestAccResourcePackagePolicy(t *testing.T) {
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "namespace", "default"),
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "description", "This policy was updated"),
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "package.0.name", "winlog"),
-					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "package.0.version", "1.12.4"),
+					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "package.0.version", "1.10.0"),
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "input.0.policy_template", "winlogs"),
 					resource.TestCheckResourceAttr("elasticstack_kibana_fleet_package_policy.test", "input.0.enabled", "true"),
 				),
@@ -76,7 +76,22 @@ resource "elasticstack_kibana_fleet_package_policy" "test" {
 
   package {
     name    = "winlog"
-    version = "1.12.4"
+    version = "1.10.0"
+  }
+
+  input {
+    policy_template = "winlogs"
+    type            = "httpjson"
+    vars_json = jsonencode({
+      url = "https://server.example.com:8089"
+    })
+    stream {
+      data_stream = "winlog"
+      vars_json = jsonencode({
+        interval = "10s"
+        search   = "search sourcetype=\"XmlWinEventLog:ChannelName\""
+      })
+    }
   }
 
   input {
@@ -128,7 +143,22 @@ resource "elasticstack_kibana_fleet_package_policy" "test" {
 
   package {
     name    = "winlog"
-    version = "1.12.4"
+    version = "1.10.0"
+  }
+
+  input {
+    policy_template = "winlogs"
+    type            = "httpjson"
+    vars_json = jsonencode({
+      url = "https://server.example.com:8089"
+    })
+    stream {
+      data_stream = "winlog"
+      vars_json = jsonencode({
+        interval = "10s"
+        search   = "search sourcetype=\"XmlWinEventLog:ChannelName\""
+      })
+    }
   }
 
   input {
