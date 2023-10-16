@@ -137,9 +137,9 @@ func checkResourceAgentPolicyDestroy(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		packagePolicy, diag := fleet.ReadAgentPolicy(context.Background(), fleetClient, rs.Primary.ID)
-		if diag.HasError() {
-			return fmt.Errorf(diag[0].Summary)
+		packagePolicy, err := fleet.ReadAgentPolicy(context.Background(), fleetClient, rs.Primary.ID)
+		if err != nil {
+			return err
 		}
 		if packagePolicy != nil {
 			return fmt.Errorf("agent policy id=%v still exists, but it should have been removed", rs.Primary.ID)
@@ -163,16 +163,16 @@ func checkResourceAgentPolicySkipDestroy(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		packagePolicy, diag := fleet.ReadAgentPolicy(context.Background(), fleetClient, rs.Primary.ID)
-		if diag.HasError() {
-			return fmt.Errorf(diag[0].Summary)
+		packagePolicy, err := fleet.ReadAgentPolicy(context.Background(), fleetClient, rs.Primary.ID)
+		if err != nil {
+			return err
 		}
 		if packagePolicy == nil {
 			return fmt.Errorf("agent policy id=%v does not exist, but should still exist when skip_destroy is true", rs.Primary.ID)
 		}
 
-		if diag = fleet.DeleteAgentPolicy(context.Background(), fleetClient, rs.Primary.ID); diag.HasError() {
-			return fmt.Errorf(diag[0].Summary)
+		if err = fleet.DeleteAgentPolicy(context.Background(), fleetClient, rs.Primary.ID); err != nil {
+			return err
 		}
 	}
 	return nil

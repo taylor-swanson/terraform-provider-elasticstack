@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/terraform-provider-elasticstack/internal/clients"
 	"github.com/elastic/terraform-provider-elasticstack/internal/clients/config"
+	"github.com/elastic/terraform-provider-elasticstack/internal/fleet"
 	"github.com/elastic/terraform-provider-elasticstack/internal/kibana/import_saved_objects"
 	"github.com/elastic/terraform-provider-elasticstack/internal/schema"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -58,11 +59,17 @@ func (p *Provider) Configure(ctx context.Context, req fwprovider.ConfigureReques
 }
 
 func (p *Provider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+		fleet.NewEnrollmentTokenDataSource,
+	}
 }
 
 func (p *Provider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		func() resource.Resource { return &import_saved_objects.Resource{} },
+
+		fleet.NewAgentPolicyResource,
+		fleet.NewOutputResource,
+		fleet.NewServerHostResource,
 	}
 }

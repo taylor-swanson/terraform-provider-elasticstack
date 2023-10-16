@@ -97,9 +97,9 @@ func checkResourceFleetServerHostDestroy(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		packagePolicy, diag := fleet.ReadFleetServerHost(context.Background(), fleetClient, rs.Primary.ID)
-		if diag.HasError() {
-			return fmt.Errorf(diag[0].Summary)
+		packagePolicy, err := fleet.ReadFleetServerHost(context.Background(), fleetClient, rs.Primary.ID)
+		if err != nil {
+			return err
 		}
 		if packagePolicy != nil {
 			return fmt.Errorf("FleetServerHost id=%v still exists, but it should have been removed", rs.Primary.ID)

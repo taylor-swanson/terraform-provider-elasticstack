@@ -10,23 +10,23 @@ import (
 )
 
 // AllEnrollmentTokens reads all enrollment tokens from the API.
-func AllEnrollmentTokens(ctx context.Context, client *Client) ([]fleetapi.EnrollmentApiKey, diag.Diagnostics) {
+func AllEnrollmentTokens(ctx context.Context, client *Client) ([]fleetapi.EnrollmentApiKey, error) {
 	resp, err := client.API.GetEnrollmentApiKeysWithResponse(ctx)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	if resp.StatusCode() == http.StatusOK {
 		return resp.JSON200.Items, nil
 	}
-	return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+	return nil, makeAPIError(resp.StatusCode(), resp.Body)
 }
 
 // ReadAgentPolicy reads a specific agent policy from the API.
-func ReadAgentPolicy(ctx context.Context, client *Client, id string) (*fleetapi.AgentPolicy, diag.Diagnostics) {
+func ReadAgentPolicy(ctx context.Context, client *Client, id string) (*fleetapi.AgentPolicy, error) {
 	resp, err := client.API.AgentPolicyInfoWithResponse(ctx, id)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	switch resp.StatusCode() {
@@ -35,49 +35,49 @@ func ReadAgentPolicy(ctx context.Context, client *Client, id string) (*fleetapi.
 	case http.StatusNotFound:
 		return nil, nil
 	default:
-		return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+		return nil, makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // CreateAgentPolicy creates a new agent policy.
-func CreateAgentPolicy(ctx context.Context, client *Client, req fleetapi.AgentPolicyCreateRequest) (*fleetapi.AgentPolicy, diag.Diagnostics) {
+func CreateAgentPolicy(ctx context.Context, client *Client, req fleetapi.AgentPolicyCreateRequest) (*fleetapi.AgentPolicy, error) {
 	resp, err := client.API.CreateAgentPolicyWithResponse(ctx, req)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	switch resp.StatusCode() {
 	case http.StatusOK:
 		return resp.JSON200.Item, nil
 	default:
-		return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+		return nil, makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // UpdateAgentPolicy updates an existing agent policy.
-func UpdateAgentPolicy(ctx context.Context, client *Client, id string, req fleetapi.AgentPolicyUpdateRequest) (*fleetapi.AgentPolicy, diag.Diagnostics) {
+func UpdateAgentPolicy(ctx context.Context, client *Client, id string, req fleetapi.AgentPolicyUpdateRequest) (*fleetapi.AgentPolicy, error) {
 	resp, err := client.API.UpdateAgentPolicyWithResponse(ctx, id, req)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	switch resp.StatusCode() {
 	case http.StatusOK:
 		return &resp.JSON200.Item, nil
 	default:
-		return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+		return nil, makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // DeleteAgentPolicy deletes an existing agent policy
-func DeleteAgentPolicy(ctx context.Context, client *Client, id string) diag.Diagnostics {
+func DeleteAgentPolicy(ctx context.Context, client *Client, id string) error {
 	body := fleetapi.DeleteAgentPolicyJSONRequestBody{
 		AgentPolicyId: id,
 	}
 
 	resp, err := client.API.DeleteAgentPolicyWithResponse(ctx, body)
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	switch resp.StatusCode() {
@@ -86,15 +86,15 @@ func DeleteAgentPolicy(ctx context.Context, client *Client, id string) diag.Diag
 	case http.StatusNotFound:
 		return nil
 	default:
-		return reportUnknownError(resp.StatusCode(), resp.Body)
+		return makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // ReadOutput reads a specific output from the API.
-func ReadOutput(ctx context.Context, client *Client, id string) (*fleetapi.OutputCreateRequest, diag.Diagnostics) {
+func ReadOutput(ctx context.Context, client *Client, id string) (*fleetapi.OutputCreateRequest, error) {
 	resp, err := client.API.GetOutputWithResponse(ctx, id)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	switch resp.StatusCode() {
@@ -103,45 +103,45 @@ func ReadOutput(ctx context.Context, client *Client, id string) (*fleetapi.Outpu
 	case http.StatusNotFound:
 		return nil, nil
 	default:
-		return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+		return nil, makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // CreateOutput creates a new output.
-func CreateOutput(ctx context.Context, client *Client, req fleetapi.PostOutputsJSONRequestBody) (*fleetapi.OutputCreateRequest, diag.Diagnostics) {
+func CreateOutput(ctx context.Context, client *Client, req fleetapi.PostOutputsJSONRequestBody) (*fleetapi.OutputCreateRequest, error) {
 	resp, err := client.API.PostOutputsWithResponse(ctx, req)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	switch resp.StatusCode() {
 	case http.StatusOK:
 		return resp.JSON200.Item, nil
 	default:
-		return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+		return nil, makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // UpdateOutput updates an existing output.
-func UpdateOutput(ctx context.Context, client *Client, id string, req fleetapi.UpdateOutputJSONRequestBody) (*fleetapi.OutputUpdateRequest, diag.Diagnostics) {
+func UpdateOutput(ctx context.Context, client *Client, id string, req fleetapi.UpdateOutputJSONRequestBody) (*fleetapi.OutputUpdateRequest, error) {
 	resp, err := client.API.UpdateOutputWithResponse(ctx, id, req)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	switch resp.StatusCode() {
 	case http.StatusOK:
 		return resp.JSON200.Item, nil
 	default:
-		return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+		return nil, makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // DeleteOutput deletes an existing output
-func DeleteOutput(ctx context.Context, client *Client, id string) diag.Diagnostics {
+func DeleteOutput(ctx context.Context, client *Client, id string) error {
 	resp, err := client.API.DeleteOutputWithResponse(ctx, id)
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	switch resp.StatusCode() {
@@ -150,15 +150,15 @@ func DeleteOutput(ctx context.Context, client *Client, id string) diag.Diagnosti
 	case http.StatusNotFound:
 		return nil
 	default:
-		return reportUnknownError(resp.StatusCode(), resp.Body)
+		return makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // ReadFleetServerHost reads a specific fleet server host from the API.
-func ReadFleetServerHost(ctx context.Context, client *Client, id string) (*fleetapi.FleetServerHost, diag.Diagnostics) {
+func ReadFleetServerHost(ctx context.Context, client *Client, id string) (*fleetapi.FleetServerHost, error) {
 	resp, err := client.API.GetOneFleetServerHostsWithResponse(ctx, id)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	switch resp.StatusCode() {
@@ -167,45 +167,45 @@ func ReadFleetServerHost(ctx context.Context, client *Client, id string) (*fleet
 	case http.StatusNotFound:
 		return nil, nil
 	default:
-		return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+		return nil, makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // CreateFleetServerHost creates a new fleet server host.
-func CreateFleetServerHost(ctx context.Context, client *Client, req fleetapi.PostFleetServerHostsJSONRequestBody) (*fleetapi.FleetServerHost, diag.Diagnostics) {
+func CreateFleetServerHost(ctx context.Context, client *Client, req fleetapi.PostFleetServerHostsJSONRequestBody) (*fleetapi.FleetServerHost, error) {
 	resp, err := client.API.PostFleetServerHostsWithResponse(ctx, req)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	switch resp.StatusCode() {
 	case http.StatusOK:
 		return resp.JSON200.Item, nil
 	default:
-		return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+		return nil, makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // UpdateFleetServerHost updates an existing fleet server host.
-func UpdateFleetServerHost(ctx context.Context, client *Client, id string, req fleetapi.UpdateFleetServerHostsJSONRequestBody) (*fleetapi.FleetServerHost, diag.Diagnostics) {
+func UpdateFleetServerHost(ctx context.Context, client *Client, id string, req fleetapi.UpdateFleetServerHostsJSONRequestBody) (*fleetapi.FleetServerHost, error) {
 	resp, err := client.API.UpdateFleetServerHostsWithResponse(ctx, id, req)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		return nil, err
 	}
 
 	switch resp.StatusCode() {
 	case http.StatusOK:
 		return &resp.JSON200.Item, nil
 	default:
-		return nil, reportUnknownError(resp.StatusCode(), resp.Body)
+		return nil, makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
 // DeleteFleetServerHost deletes an existing fleet server host.
-func DeleteFleetServerHost(ctx context.Context, client *Client, id string) diag.Diagnostics {
+func DeleteFleetServerHost(ctx context.Context, client *Client, id string) error {
 	resp, err := client.API.DeleteFleetServerHostsWithResponse(ctx, id)
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	switch resp.StatusCode() {
@@ -214,7 +214,7 @@ func DeleteFleetServerHost(ctx context.Context, client *Client, id string) diag.
 	case http.StatusNotFound:
 		return nil
 	default:
-		return reportUnknownError(resp.StatusCode(), resp.Body)
+		return makeAPIError(resp.StatusCode(), resp.Body)
 	}
 }
 
@@ -226,4 +226,8 @@ func reportUnknownError(statusCode int, body []byte) diag.Diagnostics {
 			Detail:   string(body),
 		},
 	}
+}
+
+func makeAPIError(statusCode int, body []byte) error {
+	return fmt.Errorf("unexpected status code from API: HTTP %d, details: %s", statusCode, string(body))
 }

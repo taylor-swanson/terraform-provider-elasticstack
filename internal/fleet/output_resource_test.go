@@ -194,9 +194,9 @@ func checkResourceOutputDestroy(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		packagePolicy, diag := fleet.ReadOutput(context.Background(), fleetClient, rs.Primary.ID)
-		if diag.HasError() {
-			return fmt.Errorf(diag[0].Summary)
+		packagePolicy, err := fleet.ReadOutput(context.Background(), fleetClient, rs.Primary.ID)
+		if err != nil {
+			return err
 		}
 		if packagePolicy != nil {
 			return fmt.Errorf("output id=%v still exists, but it should have been removed", rs.Primary.ID)
